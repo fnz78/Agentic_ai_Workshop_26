@@ -32,7 +32,11 @@ This project is a **Retrieval-Augmented Generation (RAG)** based AI system desig
 
 Run the following commands to set up your environment:
 
-```bash
+bash
 pip install -q langchain-groq langchain langchain-core \
 langchain-community langchain-text-splitters \
 sentence-transformers faiss-cpu PyPDF
+
+
+##🔐 API Setup
+​This project requires a Groq API Key. If using Google Colab, store it in "Secrets" under the name GAPI.
