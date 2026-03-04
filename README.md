@@ -1,282 +1,141 @@
-**📚 AI Exam Paper Generator using RAG**
-
-(LangChain + FAISS + Groq LLM)
-
-This project is a Retrieval-Augmented Generation (RAG) based AI system that:
-
-• Loads a PDF textbook
-
-• Splits it into meaningful chunks
-
-• Creates semantic vector embeddings
-
-• Stores them in a FAISS vector database
-
-• Retrieves relevant context
-
-• Uses an LLM (via Groq API) to generate exam-style multiple-choice questions
-
-• Built during a hands-on AI workshop using modern LLM tooling.
-
-##🚀 Features##
-
-✅ PDF document loading
-
-✅ Intelligent text chunking
-
-✅ Semantic embeddings using HuggingFace
-
-✅ Vector storage using FAISS
-
-✅ Context-aware question generation
-
-✅ Multiple RetrievalQA chain types (stuff, map_reduce)
-
-✅ Automatic MCQ generation with answers
 
 
+***
 
-##🛠️ Tech Stack##
+# 📚 AI Exam Paper Generator using RAG
+### (LangChain + FAISS + Groq LLM)
 
-• Python 3.12
+This project is a **Retrieval-Augmented Generation (RAG)** based AI system designed to automate the creation of exam papers. It processes PDF textbooks, indexes their content, and uses Large Language Models (LLMs) to generate context-aware multiple-choice questions (MCQs).
 
-• LangChain
+Built during a hands-on AI workshop (Agentic_ai_Workshop_26), this tool demonstrates a full RAG pipeline using modern LLM orchestration.
 
-• LangChain Community
+---
 
-• LangChain Text Splitters
+## 🚀 Features
 
-• FAISS (Vector Database)
+- ✅ **PDF Document Loading:** Extracts text from educational materials.
+- ✅ **Intelligent Text Chunking:** Breaks down long chapters into manageable segments.
+- ✅ **Semantic Embeddings:** Uses HuggingFace transformers for high-quality vector representations.
+- ✅ **Vector Storage:** Efficient similarity search using FAISS.
+- ✅ **Context-Aware Generation:** Ensures questions are grounded in the provided textbook.
+- ✅ **Advanced RAG Chains:** Supports both `stuff` and `map_reduce` retrieval chains.
+- ✅ **Structured Output:** Automatically generates 10 MCQs with correct answer keys.
 
-• Sentence Transformers
+---
 
-• Groq LLM (LLaMA models)
+## 🛠️ Tech Stack
 
-• PyPDF
+- **Language:** Python 3.12
+- **Framework:** [LangChain](https://www.langchain.com/)
+- **LLM:** [Groq](https://groq.com/) (LLaMA 3.3-70b & 3.1-8b)
+- **Vector Database:** FAISS (CPU)
+- **Embeddings:** HuggingFace (`sentence-transformers/all-MiniLM-L6-v2`)
+- **PDF Parsing:** PyPDF
+- **Environment:** Google Colab
 
-• Google Colab
+---
 
-##📦 Installation##
+## 📦 Installation
 
-Run the following in Google Colab or your local environment:
+Run the following commands to set up the environment:
 
+```bash
+pip install -q langchain-groq langchain langchain-core langchain-community langchain-text-splitters
+pip install -q sentence-transformers faiss-cpu PyPDF
+```
 
+---
 
-Bash
+## 🔐 API Setup
 
-pip install -q langchain-groq
+This project uses the **Groq API** for high-speed inference. If using Google Colab, store your key in the "Secrets" tab.
 
-pip install langchain
-
-pip install -U langchain langchain-core langchain-community langchain-text-splitters
-
-pip install sentence-transformers
-
-pip install faiss-cpu
-
-pip install PyPDF
-
-##🔐 API Setup##
-
-Store your Groq API key in Google Colab Secrets.
-
-Load it:
-
-
+```python
+import os
 from google.colab import userdata
 
-gkey = userdata.get('GAPI')
+# Load Groq API Key
+os.environ["GROQ_API_KEY"] = userdata.get('GAPI')
+```
 
+---
 
-Set environment variable:
+## 📄 Step-by-Step Workflow
 
-
-import os
-
-os.environ["GROQ_API_KEY"] = gkey
-
-📄 Step-by-Step Workflow
-
-1️⃣ Load PDF
-
-
+### 1. Load PDF & Split into Chunks
+```python
 from langchain_community.document_loaders import PyPDFLoader
-
-loader = PyPDFLoader("/content/kemh102.pdf")
-
-docs = loader.load()
-
-2️⃣ Split into Chunks
-
-
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-splitter = RecursiveCharacterTextSplitter(
+loader = PyPDFLoader("/content/kemh102.pdf")
+docs = loader.load()
 
-chunk_size=1000,
-
-chunk_overlap=200
-
-)
-
+splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 chunks = splitter.split_documents(docs)
+```
 
-3️⃣ Create Embeddings
-
+### 2. Create Embeddings & FAISS Index
+```python
 from langchain_community.embeddings import HuggingFaceEmbeddings
-
-emb = HuggingFaceEmbeddings(
-
-model_name="sentence-transformers/all-MiniLM-L6-v2"
-
-)
-
-4️⃣ Create FAISS Vector Store
-
-
 from langchain_community.vectorstores import FAISS
 
+emb = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 index = FAISS.from_documents(chunks, emb)
-
 retriever = index.as_retriever(search_kwargs={"k": 5})
+```
 
-5️⃣ Similarity Search
-
-
-results_with_scores = index.similarity_search_with_score(
-
-"relations and functions",
-
-k=5
-
-)
-
-6️⃣ LLM Integration (Groq)
-
-
+### 3. LLM Integration (Groq)
+```python
 from langchain_groq import ChatGroq
 
-llm = ChatGroq(
+llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+```
 
-model="llama-3.3-70b-versatile",
+### 4. RetrievalQA Chains
+```python
+from langchain.chains import RetrievalQA
 
-temperature=0
+# Using the 'stuff' chain type
+qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type='stuff', retriever=retriever)
+```
 
-)
+---
 
-Available models used:
+## 🧠 How It Works (RAG Pipeline)
 
-llama-3.3-70b-versatile
+1. **Ingestion:** PDF is converted into Document objects.
+2. **Chunking:** Documents are split to fit LLM context windows.
+3. **Embedding:** Text is converted into mathematical vectors.
+4. **Storage:** Vectors are stored in **FAISS** for fast retrieval.
+5. **Retrieval:** The system finds the 5 most relevant chunks based on a user query.
+6. **Generation:** The LLM uses the retrieved context to generate MCQs in a strict format:
+   - Question
+   - Options A, B, C, D
+   - Correct Answer
 
-llama-3.1-8b-instant
+---
 
+## 📊 Example Use Cases
 
+- **Automated Test Banks:** Create thousands of questions for EdTech platforms.
+- **Study Assistant:** Generate self-assessment quizzes from personal notes.
+- **NCERT/Textbook Processing:** Specifically tuned for academic textbook structures.
 
-7️⃣ MCQ Generation Prompt Format
+---
 
-The system generates 10 structured multiple-choice questions in strict format:
+## 📌 Future Improvements
 
+- [ ] **Frontend:** Add a Streamlit or Gradio interface for easy uploads.
+- [ ] **Export:** Enable downloading generated questions as PDF or Docx.
+- [ ] **Persistence:** Save FAISS indexes locally to avoid re-processing.
+- [ ] **Complexity Control:** Add a toggle for Difficulty Level (Easy, Medium, Hard).
+- [ ] **Explanations:** Generate a detailed rationale for why an answer is correct.
 
-1. Question text
+---
 
-A. Option text
+## 👨‍💻 Author
 
-B. Option text
+**Nazim_fnz77**  
+Created as a practical implementation of Agentic RAG during the **Agentic AI Workshop 26**.
 
-C. Option text
-
-D. Option text
-
-Answer: Correct option letter
-
-8️⃣ RetrievalQA Chains
-
-Using stuff chain:
-
-
-
-from langchain_classic.chains import RetrievalQA
-
-qa_stuff = RetrievalQA.from_chain_type(
-
-llm=llm,
-
-chain_type='stuff',
-
-retriever=retriever
-
-)
-
-Using map_reduce chain:
-
-
-qa_map_reduce = RetrievalQA.from_chain_type(
-
-llm=llm,
-
-chain_type='map_reduce',
-
-retriever=retriever
-
-)
-
-##🧠 How It Works (RAG Pipeline)##
-
-
-
-PDF → Documents
-
-Documents → Text Chunks
-
-Chunks → Embeddings
-
-Embeddings → FAISS Vector Store
-
-User Query → Retrieve Relevant Chunks
-
-Retrieved Context → LLM
-
-LLM → Generates Structured MCQs
-
-This improves accuracy compared to plain prompting because the LLM uses textbook-based context during generation.
-
-
-##📊 Example Use Cases##
-
-• Generate exam questions from textbooks (e.g., NCERT)
-
-• Create automated test banks
-
-• Build AI-powered study assistants
-
-• Develop EdTech question generation systems
-
-##⚠️ Notes##
-
-HuggingFace authentication is optional for public models.
-
-FAISS runs locally in CPU mode.
-
-Ensure Groq API key is configured properly.
-
-Works best in Google Colab.
-
-📌 Future Improvements
-
-Add Streamlit frontend
-
-Add PDF upload interface
-
-Persist vector database storage
-
-Add difficulty-level control
-
-Generate answer explanations
-
-Export questions to PDF/Docx
-
-👨‍💻 Author
-
-Nazim_fnz77
-
-Created during an AI Workshop as a practical implementation of Retrieval-Augmented Generation using LangChai
+---
