@@ -33,6 +33,7 @@ This project is a **Retrieval-Augmented Generation (RAG)** based AI system desig
 Run the following commands to set up your environment:
 
 bash
+
 pip install -q langchain-groq langchain langchain-core \
 langchain-community langchain-text-splitters \
 sentence-transformers faiss-cpu PyPDF
