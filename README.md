@@ -39,4 +39,6 @@ sentence-transformers faiss-cpu PyPDF
 
 
 ##🔐 API Setup
-​This project requires a Groq API Key. If using Google Colab, store it in "Secrets" under the name GAPI.
+
+​This project requires a Groq API Key. 
+If using Google Colab, store it in "Secrets" under the name GAPI.
