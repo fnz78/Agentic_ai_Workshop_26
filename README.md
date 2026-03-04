@@ -1,5 +1,5 @@
-📚 AI Exam Paper Generator using RAG
-(LangChain + FAISS + Groq LLM)
+**📚 AI Exam Paper Generator using RAG
+(LangChain + FAISS + Groq LLM)**
 
 
 This project is a Retrieval-Augmented Generation (RAG) based AI system that:
