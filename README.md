@@ -1,5 +1,3 @@
-
-
 ***
 
 # 📚 AI Exam Paper Generator using RAG
