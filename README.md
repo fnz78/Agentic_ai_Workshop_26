@@ -7,6 +7,7 @@ This project is a **Retrieval-Augmented Generation (RAG)** based AI system desig
 
 Built during a hands-on AI workshop (Agentic_ai_Workshop_26), this tool demonstrates a full RAG pipeline using modern LLM orchestration.
 
+
 ---
 
 ## 🚀 Features
