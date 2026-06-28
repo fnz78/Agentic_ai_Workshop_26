@@ -3,7 +3,6 @@
 ### (LangChain + FAISS + Groq LLM)
 
 This project is a **Retrieval-Augmented Generation (RAG)** based AI system designed to automate the creation of exam papers. It processes PDF textbooks, indexes their content, and uses Large Language Models (LLMs) to generate context-aware multiple-choice questions (MCQs).
-
 Built during a hands-on AI workshop (Agentic_ai_Workshop_26), this tool demonstrates a full RAG pipeline using modern LLM orchestration.
 
 ---
